@@ -1,21 +1,44 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import GoalItem from '../rn-overview/Components/GoalItem'
+import { StyleSheet, Text, TextInput, View, Button, ScrollView, FlatList } from 'react-native';
+import GoalInput from '../rn-overview/Components/GoalInput'
 
 export default function App() {
+  const [goalsList, setGoalsList] = useState([]);
+  const [showModal, setModal] = useState(false);
+  const buttonClickHandler = (goals) => {
+    setGoalsList(goalsList => [...goalsList,
+    {
+      key: Math.random().toString(),
+      value: goals
+    }])
+    setModal(false);
+  }
+  const listItemTouchHandler = (key) => {
+    setGoalsList(goalsList => {
+      return (goalsList.filter((e) => e.key != key))
+    });
+  };
+
+  const buttonClickHandlerForModal = (openModal) => {
+    setModal(openModal);
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View style={styles.root}>
+      <Button title="Add List" onPress={() => buttonClickHandlerForModal(true)} />
+      <GoalInput buttonClickHandlerForModal = {buttonClickHandlerForModal} visible={showModal} buttonClickHandler={buttonClickHandler} />
+      <ScrollView>
+        {goalsList.map((goal) => {
+          return <GoalItem key={goal.key} id={goal.key} value={goal.value} listItemTouchHandler={listItemTouchHandler} />
+        })}
+      </ScrollView>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  root: {
+    padding: 60
+  }
+})
